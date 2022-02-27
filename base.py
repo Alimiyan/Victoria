@@ -10,6 +10,11 @@ import time
 import sys
 import os
 
+# for weather forcast
+import requests
+#import os
+from datetime import datetime
+
 # Function for implementing the loading animation
 def load_animation():
 
@@ -33,7 +38,7 @@ def load_animation():
 		
 		# used to change the animation speed
 		# smaller the value, faster will be the animation
-		time.sleep(0.075)
+		time.sleep(0.031)
 							
 		# converting the string to list
 		# as string is immutable
@@ -138,7 +143,7 @@ def speak(audio):
 	# of engine property)
 	voices = engine.getProperty('voices')
 	
-	# setter method .[0]=male voice and
+	# setter method .[0]=male voice andp
 	# [1]=female voice in set Property.
 	engine.setProperty('voice', voices[1].id)
 	
@@ -148,6 +153,33 @@ def speak(audio):
 	# Blocks while processing all the currently
 	# queued commands
 	engine.runAndWait()
+
+def weatherForcast():
+    api_key = '87d845b0b6cf29baa1a73cc34b067a95'
+    location = 'munnar'
+
+    complete_api_link = "https://api.openweathermap.org/data/2.5/weather?q="+location+"&appid="+api_key
+    api_link = requests.get(complete_api_link)
+    api_data = api_link.json()
+
+    #create variables to store and display data
+    temp_city = ((api_data['main']['temp']) - 273.15)
+    weather_desc = api_data['weather'][0]['description']
+    hmdt = api_data['main']['humidity']
+    wind_spd = api_data['wind']['speed']
+    date_time = datetime.now().strftime("%d %b %Y | %I:%M:%S %p")
+
+    speak("the temperture is {:.2f} degree celcius".format(temp_city))
+    speak("there are" + weather_desc)
+    speak("current humidity is" + str(hmdt) + "%")
+
+    print ("-------------------------------------------------------------")
+    print ("Weather Stats for - {}  || {}".format(location.upper(), date_time))
+    print ("-------------------------------------------------------------")
+
+    print ("Current temperature is: {:.2f} deg C".format(temp_city))
+    print ("Current weather desc  :",weather_desc)
+    print ("Current Humidity      :",hmdt, '%')
 
 def tellDay():
 	
@@ -207,15 +239,16 @@ def Take_query():
 		# output
 		query = takeCommand().lower()
 		if "what's the weather today" in query:
-			speak("the weather today in sunny and thirty one degree celcius")
+			weatherForcast()
 			continue
+
 		
 		elif "open google" in query:
 			speak("Opening Google ")
 			webbrowser.open("www.google.com")
 			continue
 			
-		elif "which day it is" in query:
+		elif "which day is it" in query:
 			tellDay()
 			continue
 		
@@ -244,7 +277,10 @@ def Take_query():
         
 		
 		elif "tell me your name" in query:
-			speak("I am Victoria. Your deskstop Assistant")
+			speak("I am Samantha. Your personal Assistant")
+		else:
+			speak("this feature is not intergrated, sorry for the inconvinience")
+
 
 
 if __name__ == '__main__':
